@@ -21,6 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initDashboardCustomization();
     initWidgetResize();
     initResearchTabs();
+    initScreenerTabs();
+    initPageAIAssistant();
 });
 
 // =====================================================
@@ -89,6 +91,11 @@ function initNavigation() {
             
             // Scroll to top
             window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Update Page AI Assistant context
+            if (window.updatePageAIContext) {
+                window.updatePageAIContext(pageId);
+            }
         });
     });
     
@@ -1366,6 +1373,11 @@ document.querySelectorAll('.dropdown-menu a').forEach(link => {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 // Reinitialize animations
                 setTimeout(() => initWidgetAnimations(), 100);
+                
+                // Update Page AI Assistant context
+                if (window.updatePageAIContext) {
+                    window.updatePageAIContext(pageId);
+                }
             }
         }
     });
@@ -1772,6 +1784,577 @@ function initResearchTabs() {
             if (targetContent) {
                 targetContent.classList.add('active');
             }
+        });
+    });
+}
+
+// =====================================================
+// SCREENER TABS FUNCTIONALITY
+// =====================================================
+
+function initScreenerTabs() {
+    const screenerTabs = document.querySelectorAll('.screener-tabs .tab-btn');
+    
+    // Elements for Issuers view
+    const issuersResultsHeader = document.getElementById('issuersResultsHeader');
+    const issuersColumnBar = document.getElementById('issuersColumnBar');
+    const issuersTableContainer = document.getElementById('issuersTableContainer');
+    
+    // Elements for Securities view
+    const securitiesResultsHeader = document.getElementById('securitiesResultsHeader');
+    const securitiesColumnBar = document.getElementById('securitiesColumnBar');
+    const securitiesTableContainer = document.getElementById('securitiesTableContainer');
+    
+    // Elements for Deals view
+    const dealsResultsHeader = document.getElementById('dealsResultsHeader');
+    const dealsColumnBar = document.getElementById('dealsColumnBar');
+    const dealsTableContainer = document.getElementById('dealsTableContainer');
+    
+    // Tax Status filter (only relevant for Securities)
+    const taxStatusFilter = document.getElementById('taxStatusFilter');
+    
+    screenerTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const targetTab = tab.dataset.tab;
+            
+            // Remove active from all tabs
+            screenerTabs.forEach(t => t.classList.remove('active'));
+            
+            // Add active to clicked tab
+            tab.classList.add('active');
+            
+            // Toggle views based on selected tab
+            if (targetTab === 'issuers') {
+                // Show Issuers view
+                if (issuersResultsHeader) issuersResultsHeader.style.display = '';
+                if (issuersColumnBar) issuersColumnBar.style.display = '';
+                if (issuersTableContainer) issuersTableContainer.style.display = '';
+                
+                // Hide Securities view
+                if (securitiesResultsHeader) securitiesResultsHeader.style.display = 'none';
+                if (securitiesColumnBar) securitiesColumnBar.style.display = 'none';
+                if (securitiesTableContainer) securitiesTableContainer.style.display = 'none';
+                
+                // Hide Deals view
+                if (dealsResultsHeader) dealsResultsHeader.style.display = 'none';
+                if (dealsColumnBar) dealsColumnBar.style.display = 'none';
+                if (dealsTableContainer) dealsTableContainer.style.display = 'none';
+                
+            } else if (targetTab === 'securities') {
+                // Hide Issuers view
+                if (issuersResultsHeader) issuersResultsHeader.style.display = 'none';
+                if (issuersColumnBar) issuersColumnBar.style.display = 'none';
+                if (issuersTableContainer) issuersTableContainer.style.display = 'none';
+                
+                // Show Securities view
+                if (securitiesResultsHeader) securitiesResultsHeader.style.display = '';
+                if (securitiesColumnBar) securitiesColumnBar.style.display = '';
+                if (securitiesTableContainer) securitiesTableContainer.style.display = '';
+                
+                // Hide Deals view
+                if (dealsResultsHeader) dealsResultsHeader.style.display = 'none';
+                if (dealsColumnBar) dealsColumnBar.style.display = 'none';
+                if (dealsTableContainer) dealsTableContainer.style.display = 'none';
+                
+            } else if (targetTab === 'deals') {
+                // Hide Issuers view
+                if (issuersResultsHeader) issuersResultsHeader.style.display = 'none';
+                if (issuersColumnBar) issuersColumnBar.style.display = 'none';
+                if (issuersTableContainer) issuersTableContainer.style.display = 'none';
+                
+                // Hide Securities view
+                if (securitiesResultsHeader) securitiesResultsHeader.style.display = 'none';
+                if (securitiesColumnBar) securitiesColumnBar.style.display = 'none';
+                if (securitiesTableContainer) securitiesTableContainer.style.display = 'none';
+                
+                // Show Deals view
+                if (dealsResultsHeader) dealsResultsHeader.style.display = '';
+                if (dealsColumnBar) dealsColumnBar.style.display = '';
+                if (dealsTableContainer) dealsTableContainer.style.display = '';
+            }
+        });
+    });
+}
+
+// =====================================================
+// NEWS ENTITY SEARCH
+// =====================================================
+
+function initNewsEntitySearch() {
+    const searchInput = document.getElementById('newsEntitySearch');
+    const suggestionsContainer = document.getElementById('entitySearchSuggestions');
+    const clearBtn = document.getElementById('clearEntitySearch');
+    const topEntityCards = document.querySelectorAll('.top-entity-card');
+    const newsArticles = document.querySelectorAll('.news-article');
+    
+    if (!searchInput || !suggestionsContainer) return;
+    
+    // Entity database for search
+    const entities = [
+        { name: 'State of California', type: 'State', icon: 'fa-landmark' },
+        { name: 'State of New York', type: 'State', icon: 'fa-landmark' },
+        { name: 'State of Texas', type: 'State', icon: 'fa-landmark' },
+        { name: 'State of Illinois', type: 'State', icon: 'fa-landmark' },
+        { name: 'State of Florida', type: 'State', icon: 'fa-landmark' },
+        { name: 'State of Pennsylvania', type: 'State', icon: 'fa-landmark' },
+        { name: 'New York City', type: 'City', icon: 'fa-city' },
+        { name: 'Chicago', type: 'City', icon: 'fa-city' },
+        { name: 'Los Angeles', type: 'City', icon: 'fa-city' },
+        { name: 'Houston', type: 'City', icon: 'fa-city' },
+        { name: 'Philadelphia', type: 'City', icon: 'fa-city' },
+        { name: 'Phoenix', type: 'City', icon: 'fa-city' },
+        { name: 'Metropolitan Transportation Authority', type: 'Authority', icon: 'fa-train' },
+        { name: 'Port Authority of NY & NJ', type: 'Authority', icon: 'fa-ship' },
+        { name: 'Los Angeles DWP', type: 'Utility', icon: 'fa-bolt' },
+        { name: 'NYC Municipal Water', type: 'Utility', icon: 'fa-droplet' },
+        { name: 'Federal Reserve', type: 'Topic', icon: 'fa-university' },
+        { name: 'Green Bonds', type: 'Topic', icon: 'fa-leaf' }
+    ];
+    
+    let currentFilter = null;
+    
+    // Show suggestions on focus
+    searchInput.addEventListener('focus', () => {
+        if (searchInput.value.trim() === '') {
+            updateSuggestions('');
+        }
+        suggestionsContainer.classList.add('active');
+    });
+    
+    // Hide suggestions on blur (with delay for click)
+    searchInput.addEventListener('blur', () => {
+        setTimeout(() => {
+            suggestionsContainer.classList.remove('active');
+        }, 200);
+    });
+    
+    // Filter suggestions as user types
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.trim();
+        updateSuggestions(query);
+        
+        if (query === '') {
+            clearFilter();
+        }
+    });
+    
+    // Clear button
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            clearFilter();
+            suggestionsContainer.classList.remove('active');
+        });
+    }
+    
+    // Update suggestions dropdown
+    function updateSuggestions(query) {
+        const filtered = query === '' 
+            ? entities.slice(0, 8) 
+            : entities.filter(e => e.name.toLowerCase().includes(query.toLowerCase()));
+        
+        suggestionsContainer.innerHTML = filtered.map(entity => `
+            <div class="suggestion-item" data-entity="${entity.name}">
+                <i class="fas ${entity.icon}"></i>
+                <span>${highlightMatch(entity.name, query)}</span>
+                <span class="entity-type">${entity.type}</span>
+            </div>
+        `).join('');
+        
+        // Add click handlers to suggestions
+        suggestionsContainer.querySelectorAll('.suggestion-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const entityName = item.dataset.entity;
+                searchInput.value = entityName;
+                applyFilter(entityName);
+                suggestionsContainer.classList.remove('active');
+            });
+        });
+    }
+    
+    // Highlight matching text
+    function highlightMatch(text, query) {
+        if (!query) return text;
+        const regex = new RegExp(`(${query})`, 'gi');
+        return text.replace(regex, '<strong>$1</strong>');
+    }
+    
+    // Apply filter to news articles
+    function applyFilter(entityName) {
+        currentFilter = entityName.toLowerCase();
+        
+        // Show/hide active filter bar
+        let filterBar = document.querySelector('.news-entity-active-filter');
+        if (!filterBar) {
+            filterBar = document.createElement('div');
+            filterBar.className = 'news-entity-active-filter active';
+            filterBar.innerHTML = `
+                <span class="filter-label">Showing news for:</span>
+                <span class="filter-entity">${entityName}</span>
+                <button class="clear-filter-btn">Clear Filter</button>
+            `;
+            const newsFeedContainer = document.querySelector('.news-feed-container');
+            if (newsFeedContainer) {
+                newsFeedContainer.parentNode.insertBefore(filterBar, newsFeedContainer);
+            }
+            
+            filterBar.querySelector('.clear-filter-btn').addEventListener('click', () => {
+                searchInput.value = '';
+                clearFilter();
+            });
+        } else {
+            filterBar.classList.add('active');
+            filterBar.querySelector('.filter-entity').textContent = entityName;
+        }
+        
+        // Filter news articles
+        newsArticles.forEach(article => {
+            const entityTags = article.querySelectorAll('.entity-tag');
+            const articleText = article.textContent.toLowerCase();
+            let matches = articleText.includes(currentFilter);
+            
+            entityTags.forEach(tag => {
+                if (tag.textContent.toLowerCase().includes(currentFilter)) {
+                    matches = true;
+                }
+            });
+            
+            article.style.display = matches ? '' : 'none';
+        });
+        
+        // Highlight matching top entity card
+        topEntityCards.forEach(card => {
+            const cardEntity = card.dataset.entity?.toLowerCase() || '';
+            if (cardEntity.includes(currentFilter) || currentFilter.includes(cardEntity)) {
+                card.style.outline = '2px solid var(--primary)';
+                card.style.outlineOffset = '2px';
+            } else {
+                card.style.outline = '';
+                card.style.outlineOffset = '';
+            }
+        });
+    }
+    
+    // Clear filter
+    function clearFilter() {
+        currentFilter = null;
+        
+        const filterBar = document.querySelector('.news-entity-active-filter');
+        if (filterBar) {
+            filterBar.classList.remove('active');
+        }
+        
+        // Show all articles
+        newsArticles.forEach(article => {
+            article.style.display = '';
+        });
+        
+        // Remove highlights from entity cards
+        topEntityCards.forEach(card => {
+            card.style.outline = '';
+            card.style.outlineOffset = '';
+        });
+    }
+    
+    // Click on top entity card to filter
+    topEntityCards.forEach(card => {
+        card.addEventListener('click', () => {
+            const entityName = card.dataset.entity;
+            if (entityName) {
+                searchInput.value = entityName;
+                applyFilter(entityName);
+            }
+        });
+    });
+    
+    // Enter key to search
+    searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const query = searchInput.value.trim();
+            if (query) {
+                applyFilter(query);
+                suggestionsContainer.classList.remove('active');
+            }
+        }
+        if (e.key === 'Escape') {
+            suggestionsContainer.classList.remove('active');
+            searchInput.blur();
+        }
+    });
+}
+
+// Initialize news entity search when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    initNewsEntitySearch();
+});
+
+// =====================================================
+// PAGE-CONTEXTUAL AI ASSISTANT
+// =====================================================
+
+function initPageAIAssistant() {
+    const aiAssistant = document.getElementById('pageAIAssistant');
+    const aiExpandBtn = document.getElementById('aiExpandBtn');
+    const aiMinimizeBtn = document.getElementById('aiMinimizeBtn');
+    const aiExpandedChat = document.getElementById('aiExpandedChat');
+    const aiQuickInput = document.getElementById('aiQuickInput');
+    const aiSendBtn = document.getElementById('aiSendBtn');
+    const aiChatInput = document.getElementById('aiChatInput');
+    const aiChatSend = document.getElementById('aiChatSend');
+    const aiChatMessages = document.getElementById('aiChatMessages');
+    const aiContextLabel = document.getElementById('aiContextLabel');
+    const aiPageContext = document.getElementById('aiPageContext');
+    const aiContextIndicator = document.getElementById('aiContextIndicator');
+    const aiPromptChips = document.querySelectorAll('.ai-prompt-chip');
+    const aiSuggestionBtns = document.querySelectorAll('.ai-suggestion-btn');
+    
+    if (!aiAssistant) return;
+    
+    // Page context mappings
+    const pageContexts = {
+        'dashboard': { name: 'Dashboard', hidden: true, context: 'Dashboard overview' },
+        'entities': { name: 'Entities Explorer', context: 'municipal entities, issuers, and credit profiles' },
+        'rating-actions': { name: 'Rating Actions', context: 'recent rating changes, upgrades, downgrades, and credit actions' },
+        'credit-opinions': { name: 'Credit Opinions', context: 'credit opinions and assessments' },
+        'research-library': { name: 'Research Library', context: 'research reports and publications' },
+        'methodologies': { name: 'Methodologies', context: 'rating methodologies and criteria' },
+        'default-studies': { name: 'Default Studies', context: 'default rates and historical studies' },
+        'securities': { name: 'Securities', context: 'municipal bonds and securities data' },
+        'financials': { name: 'Financials', context: 'financial statements and metrics' },
+        'news': { name: 'News & Sentiment', context: 'market news and sentiment analysis' },
+        'environmental': { name: 'Environmental Utilities', context: 'environmental and water utility sector data' },
+        'healthcare': { name: 'Healthcare', context: 'healthcare provider sector analysis' },
+        'higher-education': { name: 'Higher Education', context: 'higher education and non-profit sector' },
+        'housing': { name: 'Housing', context: 'housing finance sector data' },
+        'local-government': { name: 'Local Government', context: 'local government credit profiles' },
+        'multi-obligor': { name: 'Multi-Obligor Pools', context: 'pooled municipal debt programs' },
+        'municipal-products': { name: 'Municipal Products', context: 'municipal supported products' },
+        'power-gas': { name: 'Power & Gas', context: 'power and gas utility sector' },
+        'state-government': { name: 'State Government', context: 'state government credit analysis' },
+        'tourism': { name: 'Tourism & Economic Dev', context: 'tourism and economic development' },
+        'transportation': { name: 'Transportation', context: 'transportation authorities and infrastructure' },
+        'qrate': { name: 'QRATE Tool', context: 'quick rating analysis and scenarios' },
+        'screener': { name: 'Screener', context: 'issuer and security screening criteria' },
+        'monitoring': { name: 'Monitoring', context: 'portfolio monitoring and alerts' }
+    };
+    
+    // Update AI context based on current page
+    function updateAIContext(pageId) {
+        const context = pageContexts[pageId] || { name: 'Page Assistant', context: 'the current page content' };
+        
+        // Hide AI assistant on Dashboard
+        if (context.hidden) {
+            aiAssistant.classList.add('hidden');
+        } else {
+            aiAssistant.classList.remove('hidden');
+        }
+        
+        // Update context labels
+        if (aiContextLabel) {
+            aiContextLabel.textContent = `Ask questions about ${context.context}`;
+        }
+        if (aiPageContext) {
+            aiPageContext.textContent = context.name;
+        }
+        if (aiContextIndicator) {
+            aiContextIndicator.textContent = `Context: ${context.name}`;
+        }
+        
+        // Update placeholder text
+        if (aiQuickInput) {
+            aiQuickInput.placeholder = `Ask about ${context.context}...`;
+        }
+        if (aiChatInput) {
+            aiChatInput.placeholder = `Ask about ${context.context}...`;
+        }
+    }
+    
+    // Initial context update based on active page
+    const activePage = document.querySelector('.page.active');
+    if (activePage) {
+        const pageId = activePage.id.replace('page-', '');
+        updateAIContext(pageId);
+    }
+    
+    // Listen for page changes (via custom event or mutation observer)
+    // We'll hook into the navigation system
+    window.updatePageAIContext = updateAIContext;
+    
+    // Expand chat
+    if (aiExpandBtn) {
+        aiExpandBtn.addEventListener('click', () => {
+            aiAssistant.classList.add('expanded');
+            aiExpandedChat.classList.add('active');
+            if (aiChatInput) aiChatInput.focus();
+        });
+    }
+    
+    // Minimize chat
+    if (aiMinimizeBtn) {
+        aiMinimizeBtn.addEventListener('click', () => {
+            aiAssistant.classList.remove('expanded');
+            aiExpandedChat.classList.remove('active');
+        });
+    }
+    
+    // Send message function
+    function sendMessage(message) {
+        if (!message.trim()) return;
+        
+        // Add user message
+        addMessage(message, 'user');
+        
+        // Clear inputs
+        if (aiQuickInput) aiQuickInput.value = '';
+        if (aiChatInput) aiChatInput.value = '';
+        
+        // Show typing indicator
+        showTypingIndicator();
+        
+        // Simulate AI response (in production, this would call an API)
+        setTimeout(() => {
+            removeTypingIndicator();
+            const response = generateContextualResponse(message);
+            addMessage(response, 'assistant');
+        }, 1000 + Math.random() * 1000);
+    }
+    
+    // Add message to chat
+    function addMessage(text, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `ai-message ai-message-${sender}`;
+        
+        const avatarDiv = document.createElement('div');
+        avatarDiv.className = 'ai-message-avatar';
+        avatarDiv.innerHTML = sender === 'assistant' 
+            ? '<i class="fas fa-robot"></i>' 
+            : '<i class="fas fa-user"></i>';
+        
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'ai-message-content';
+        contentDiv.innerHTML = `<p>${text}</p>`;
+        
+        messageDiv.appendChild(avatarDiv);
+        messageDiv.appendChild(contentDiv);
+        
+        if (aiChatMessages) {
+            aiChatMessages.appendChild(messageDiv);
+            aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+        }
+    }
+    
+    // Show typing indicator
+    function showTypingIndicator() {
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'ai-message ai-message-assistant';
+        typingDiv.id = 'ai-typing';
+        typingDiv.innerHTML = `
+            <div class="ai-message-avatar"><i class="fas fa-robot"></i></div>
+            <div class="ai-message-content">
+                <div class="ai-typing-indicator">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+        `;
+        if (aiChatMessages) {
+            aiChatMessages.appendChild(typingDiv);
+            aiChatMessages.scrollTop = aiChatMessages.scrollHeight;
+        }
+    }
+    
+    // Remove typing indicator
+    function removeTypingIndicator() {
+        const typingDiv = document.getElementById('ai-typing');
+        if (typingDiv) typingDiv.remove();
+    }
+    
+    // Generate contextual response (simulated)
+    function generateContextualResponse(question) {
+        const activePage = document.querySelector('.page.active');
+        const pageId = activePage ? activePage.id.replace('page-', '') : 'unknown';
+        const context = pageContexts[pageId] || { name: 'this page', context: 'general information' };
+        
+        const responses = {
+            'summarize': `Based on the ${context.name} data shown, here are the key points:\n\n• This page displays information about ${context.context}\n• The data is updated regularly with the latest market information\n• You can filter and sort the data using the available controls\n\nWould you like me to explain any specific aspect in more detail?`,
+            'explain': `The ${context.name} page provides comprehensive data about ${context.context}. This includes:\n\n• Detailed metrics and analysis\n• Historical trends and comparisons\n• Interactive filtering capabilities\n\nIs there a specific element you'd like me to explain?`,
+            'compare': `I can help you compare data on the ${context.name} page. To make a comparison:\n\n1. Select the items you want to compare\n2. Use the filters to narrow down your criteria\n3. Review the side-by-side analysis\n\nWhat specific comparison would you like to make?`,
+            'default': `I'm here to help you understand the ${context.context} shown on this page. Based on your question "${question}", I can provide insights about:\n\n• Current data and trends\n• How to interpret the metrics\n• Related resources and analysis\n\nCould you be more specific about what you'd like to know?`
+        };
+        
+        const lowerQuestion = question.toLowerCase();
+        if (lowerQuestion.includes('summarize') || lowerQuestion.includes('summary') || lowerQuestion.includes('key')) {
+            return responses.summarize;
+        } else if (lowerQuestion.includes('explain') || lowerQuestion.includes('what') || lowerQuestion.includes('how')) {
+            return responses.explain;
+        } else if (lowerQuestion.includes('compare') || lowerQuestion.includes('difference')) {
+            return responses.compare;
+        }
+        
+        return responses.default;
+    }
+    
+    // Quick input send
+    if (aiSendBtn) {
+        aiSendBtn.addEventListener('click', () => {
+            if (aiQuickInput) {
+                sendMessage(aiQuickInput.value);
+                // Auto-expand when sending from quick input
+                aiAssistant.classList.add('expanded');
+                aiExpandedChat.classList.add('active');
+            }
+        });
+    }
+    
+    // Quick input enter key
+    if (aiQuickInput) {
+        aiQuickInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage(aiQuickInput.value);
+                aiAssistant.classList.add('expanded');
+                aiExpandedChat.classList.add('active');
+            }
+        });
+    }
+    
+    // Chat input send
+    if (aiChatSend) {
+        aiChatSend.addEventListener('click', () => {
+            if (aiChatInput) sendMessage(aiChatInput.value);
+        });
+    }
+    
+    // Chat input enter key
+    if (aiChatInput) {
+        aiChatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') sendMessage(aiChatInput.value);
+        });
+    }
+    
+    // Prompt chips
+    aiPromptChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            const prompt = chip.dataset.prompt;
+            const activePage = document.querySelector('.page.active');
+            const pageId = activePage ? activePage.id.replace('page-', '') : 'unknown';
+            const context = pageContexts[pageId] || { name: 'this page' };
+            
+            const prompts = {
+                'summarize': `Summarize the key information on ${context.name}`,
+                'explain': `Explain the data shown on ${context.name}`,
+                'compare': `Help me compare items on ${context.name}`
+            };
+            
+            sendMessage(prompts[prompt] || prompt);
+            aiAssistant.classList.add('expanded');
+            aiExpandedChat.classList.add('active');
+        });
+    });
+    
+    // Suggestion buttons in chat
+    aiSuggestionBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const suggestion = btn.dataset.suggestion;
+            if (suggestion) sendMessage(suggestion);
         });
     });
 }

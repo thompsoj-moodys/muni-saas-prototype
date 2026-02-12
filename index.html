@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -87,6 +87,77 @@
             </div>
         </div>
     </header>
+
+    <!-- Page-Contextual AI Chat Assistant (excluded from Dashboard) -->
+    <div class="page-ai-assistant" id="pageAIAssistant">
+        <div class="ai-assistant-bar">
+            <div class="ai-assistant-left">
+                <div class="ai-assistant-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="ai-assistant-info">
+                    <span class="ai-assistant-title">MuniView AI Assistant</span>
+                    <span class="ai-assistant-context" id="aiContextLabel">Ask questions about this page</span>
+                </div>
+            </div>
+            <div class="ai-assistant-center">
+                <div class="ai-quick-input-wrapper">
+                    <input type="text" class="ai-quick-input" id="aiQuickInput" placeholder="Ask about the content on this page...">
+                    <button class="ai-send-btn" id="aiSendBtn">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="ai-assistant-right">
+                <div class="ai-suggested-prompts" id="aiSuggestedPrompts">
+                    <button class="ai-prompt-chip" data-prompt="summarize">Summarize</button>
+                    <button class="ai-prompt-chip" data-prompt="explain">Explain</button>
+                    <button class="ai-prompt-chip" data-prompt="compare">Compare</button>
+                </div>
+                <button class="ai-expand-btn" id="aiExpandBtn" title="Expand chat">
+                    <i class="fas fa-expand-alt"></i>
+                </button>
+            </div>
+        </div>
+        <div class="ai-assistant-expanded" id="aiExpandedChat">
+            <div class="ai-chat-header">
+                <div class="ai-chat-title">
+                    <i class="fas fa-robot"></i>
+                    <span>MuniView AI - <span id="aiPageContext">Page Assistant</span></span>
+                </div>
+                <button class="ai-minimize-btn" id="aiMinimizeBtn">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
+            <div class="ai-chat-messages" id="aiChatMessages">
+                <div class="ai-message ai-message-assistant">
+                    <div class="ai-message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="ai-message-content">
+                        <p>Hello! I'm your MuniView AI Assistant. I can help you understand the content on this page. What would you like to know?</p>
+                        <div class="ai-message-suggestions">
+                            <button class="ai-suggestion-btn" data-suggestion="What are the key insights on this page?">Key insights</button>
+                            <button class="ai-suggestion-btn" data-suggestion="Explain the data shown here">Explain data</button>
+                            <button class="ai-suggestion-btn" data-suggestion="What actions can I take?">Available actions</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="ai-chat-input-area">
+                <div class="ai-context-indicator">
+                    <i class="fas fa-crosshairs"></i>
+                    <span id="aiContextIndicator">Analyzing: Current Page</span>
+                </div>
+                <div class="ai-input-wrapper">
+                    <input type="text" class="ai-chat-input" id="aiChatInput" placeholder="Type your question...">
+                    <button class="ai-chat-send" id="aiChatSend">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Main Content -->
     <main class="main-content">
@@ -1434,6 +1505,160 @@
                     <button class="btn btn-outline"><i class="fas fa-download"></i> Export</button>
                 </div>
             </section>
+
+            <!-- Entity Search Bar -->
+            <div class="news-entity-search-container">
+                <div class="entity-search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="newsEntitySearch" placeholder="Search by entity (e.g., State of California, New York City, Chicago...)">
+                    <button class="clear-search-btn" id="clearEntitySearch"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="entity-search-suggestions" id="entitySearchSuggestions">
+                    <div class="suggestion-item" data-entity="State of California">
+                        <i class="fas fa-landmark"></i>
+                        <span>State of California</span>
+                        <span class="entity-type">State</span>
+                    </div>
+                    <div class="suggestion-item" data-entity="State of New York">
+                        <i class="fas fa-landmark"></i>
+                        <span>State of New York</span>
+                        <span class="entity-type">State</span>
+                    </div>
+                    <div class="suggestion-item" data-entity="State of Texas">
+                        <i class="fas fa-landmark"></i>
+                        <span>State of Texas</span>
+                        <span class="entity-type">State</span>
+                    </div>
+                    <div class="suggestion-item" data-entity="New York City">
+                        <i class="fas fa-city"></i>
+                        <span>New York City</span>
+                        <span class="entity-type">City</span>
+                    </div>
+                    <div class="suggestion-item" data-entity="Chicago">
+                        <i class="fas fa-city"></i>
+                        <span>Chicago</span>
+                        <span class="entity-type">City</span>
+                    </div>
+                    <div class="suggestion-item" data-entity="Los Angeles">
+                        <i class="fas fa-city"></i>
+                        <span>Los Angeles</span>
+                        <span class="entity-type">City</span>
+                    </div>
+                    <div class="suggestion-item" data-entity="State of Illinois">
+                        <i class="fas fa-landmark"></i>
+                        <span>State of Illinois</span>
+                        <span class="entity-type">State</span>
+                    </div>
+                    <div class="suggestion-item" data-entity="Metropolitan Transportation Authority">
+                        <i class="fas fa-train"></i>
+                        <span>Metropolitan Transportation Authority</span>
+                        <span class="entity-type">Authority</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Entities in the News Widget -->
+            <div class="top-entities-widget">
+                <div class="widget-header">
+                    <div class="widget-title">
+                        <i class="fas fa-fire-flame-curved"></i>
+                        <h3>Top Entities in the News</h3>
+                    </div>
+                    <span class="widget-subtitle">Most mentioned municipal entities in the last 7 days</span>
+                </div>
+                <div class="top-entities-grid">
+                    <div class="top-entity-card" data-entity="State of California">
+                        <div class="entity-rank">#1</div>
+                        <div class="entity-info">
+                            <span class="entity-name">State of California</span>
+                            <span class="entity-rating"><span class="rating-badge aa">Aa2</span></span>
+                        </div>
+                        <div class="entity-news-stats">
+                            <span class="mention-count"><i class="fas fa-newspaper"></i> 47 articles</span>
+                            <span class="sentiment-indicator positive"><i class="fas fa-arrow-up"></i> +24</span>
+                        </div>
+                        <div class="entity-top-story">
+                            <span class="story-label">Top Story:</span>
+                            <span class="story-title">$3.5B Green Bond Issuance</span>
+                        </div>
+                    </div>
+                    <div class="top-entity-card" data-entity="State of Illinois">
+                        <div class="entity-rank">#2</div>
+                        <div class="entity-info">
+                            <span class="entity-name">State of Illinois</span>
+                            <span class="entity-rating"><span class="rating-badge baa">Baa1</span></span>
+                        </div>
+                        <div class="entity-news-stats">
+                            <span class="mention-count"><i class="fas fa-newspaper"></i> 38 articles</span>
+                            <span class="sentiment-indicator negative"><i class="fas fa-arrow-down"></i> -15</span>
+                        </div>
+                        <div class="entity-top-story">
+                            <span class="story-label">Top Story:</span>
+                            <span class="story-title">Pension Reform Challenges</span>
+                        </div>
+                    </div>
+                    <div class="top-entity-card" data-entity="State of New York">
+                        <div class="entity-rank">#3</div>
+                        <div class="entity-info">
+                            <span class="entity-name">State of New York</span>
+                            <span class="entity-rating"><span class="rating-badge aa">Aa1</span></span>
+                        </div>
+                        <div class="entity-news-stats">
+                            <span class="mention-count"><i class="fas fa-newspaper"></i> 32 articles</span>
+                            <span class="sentiment-indicator positive"><i class="fas fa-arrow-up"></i> +12</span>
+                        </div>
+                        <div class="entity-top-story">
+                            <span class="story-label">Top Story:</span>
+                            <span class="story-title">Budget Surplus Announced</span>
+                        </div>
+                    </div>
+                    <div class="top-entity-card" data-entity="New York City">
+                        <div class="entity-rank">#4</div>
+                        <div class="entity-info">
+                            <span class="entity-name">New York City</span>
+                            <span class="entity-rating"><span class="rating-badge aa">Aa2</span></span>
+                        </div>
+                        <div class="entity-news-stats">
+                            <span class="mention-count"><i class="fas fa-newspaper"></i> 28 articles</span>
+                            <span class="sentiment-indicator neutral"><i class="fas fa-minus"></i> +3</span>
+                        </div>
+                        <div class="entity-top-story">
+                            <span class="story-label">Top Story:</span>
+                            <span class="story-title">Infrastructure Bill Progress</span>
+                        </div>
+                    </div>
+                    <div class="top-entity-card" data-entity="Metropolitan Transportation Authority">
+                        <div class="entity-rank">#5</div>
+                        <div class="entity-info">
+                            <span class="entity-name">MTA</span>
+                            <span class="entity-rating"><span class="rating-badge a">A2</span></span>
+                        </div>
+                        <div class="entity-news-stats">
+                            <span class="mention-count"><i class="fas fa-newspaper"></i> 24 articles</span>
+                            <span class="sentiment-indicator positive"><i class="fas fa-arrow-up"></i> +8</span>
+                        </div>
+                        <div class="entity-top-story">
+                            <span class="story-label">Top Story:</span>
+                            <span class="story-title">Ridership Recovery Continues</span>
+                        </div>
+                    </div>
+                    <div class="top-entity-card" data-entity="Chicago">
+                        <div class="entity-rank">#6</div>
+                        <div class="entity-info">
+                            <span class="entity-name">City of Chicago</span>
+                            <span class="entity-rating"><span class="rating-badge baa">Baa2</span></span>
+                        </div>
+                        <div class="entity-news-stats">
+                            <span class="mention-count"><i class="fas fa-newspaper"></i> 21 articles</span>
+                            <span class="sentiment-indicator negative"><i class="fas fa-arrow-down"></i> -6</span>
+                        </div>
+                        <div class="entity-top-story">
+                            <span class="story-label">Top Story:</span>
+                            <span class="story-title">Property Tax Debate</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Sentiment Overview -->
             <div class="sentiment-overview-cards">
@@ -6286,14 +6511,21 @@
                                 <th>Issuer</th>
                                 <th>Obligor</th>
                                 <th>Description</th>
+                                <th>Sale Date</th>
+                                <th>Effective Date</th>
                                 <th>Issue Amount</th>
                                 <th>Debt Outstanding</th>
+                                <th>Rate Type</th>
                                 <th>Coupon</th>
                                 <th>Maturity</th>
+                                <th>Optional Redemption</th>
+                                <th>Mandatory Redemption</th>
                                 <th>Tax Status</th>
                                 <th>Price</th>
                                 <th>Yield</th>
-                                <th>Rating</th>
+                                <th>Spread to Benchmark</th>
+                                <th>LT Rating</th>
+                                <th>ST Rating</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -6302,84 +6534,126 @@
                                 <td><a href="#">State of California</a></td>
                                 <td>California State Treasurer</td>
                                 <td>GO Bonds Series 2024A</td>
+                                <td>01/15/2024</td>
+                                <td>02/01/2024</td>
                                 <td>$850.0M</td>
                                 <td>$742.5M</td>
+                                <td><span class="rate-type-badge fixed">Fixed</span></td>
                                 <td>5.000%</td>
                                 <td>08/01/2044</td>
+                                <td>08/01/2034 @ 100</td>
+                                <td>—</td>
                                 <td><span class="tax-badge exempt">Fed Tax-Exempt</span></td>
                                 <td class="positive">104.25</td>
                                 <td>3.42%</td>
+                                <td><span class="spread-value positive">+85 bps</span></td>
                                 <td><span class="rating-badge aa">Aa2</span></td>
+                                <td><span class="rating-badge st">VMIG 1</span></td>
                             </tr>
                             <tr>
                                 <td class="mono">64966QAB3</td>
                                 <td><a href="#">New York City, NY</a></td>
                                 <td>NYC Office of Management & Budget</td>
                                 <td>GO Bonds Fiscal 2025</td>
+                                <td>09/18/2024</td>
+                                <td>10/01/2024</td>
                                 <td>$1.2B</td>
                                 <td>$1.1B</td>
+                                <td><span class="rate-type-badge variable">Variable</span></td>
                                 <td>4.750%</td>
                                 <td>03/01/2039</td>
+                                <td>03/01/2032 @ 100</td>
+                                <td>03/01/2037</td>
                                 <td><span class="tax-badge exempt">Fed Tax-Exempt</span></td>
                                 <td class="negative">98.75</td>
                                 <td>3.89%</td>
+                                <td><span class="spread-value positive">+112 bps</span></td>
                                 <td><span class="rating-badge aa">Aa2</span></td>
+                                <td><span class="rating-badge st">P-1</span></td>
                             </tr>
                             <tr>
                                 <td class="mono">59259YBK7</td>
                                 <td><a href="#">Metropolitan Transportation Authority</a></td>
                                 <td>MTA Bridges & Tunnels</td>
                                 <td>Revenue Bonds Series 2023B</td>
+                                <td>10/25/2023</td>
+                                <td>11/15/2023</td>
                                 <td>$500.0M</td>
                                 <td>$485.2M</td>
+                                <td><span class="rate-type-badge fixed">Fixed</span></td>
                                 <td>5.250%</td>
                                 <td>11/15/2048</td>
+                                <td>11/15/2033 @ 100</td>
+                                <td>11/15/2040</td>
                                 <td><span class="tax-badge taxable">Taxable</span></td>
                                 <td class="positive">102.50</td>
                                 <td>4.12%</td>
+                                <td><span class="spread-value positive">+145 bps</span></td>
                                 <td><span class="rating-badge a">A1</span></td>
+                                <td>—</td>
                             </tr>
                             <tr>
                                 <td class="mono">882724ZD4</td>
                                 <td><a href="#">Texas Water Development Board</a></td>
                                 <td>TX Water Development Board</td>
                                 <td>State Revolving Fund Bonds</td>
+                                <td>06/20/2024</td>
+                                <td>07/15/2024</td>
                                 <td>$325.0M</td>
                                 <td>$298.7M</td>
+                                <td><span class="rate-type-badge fixed">Fixed</span></td>
                                 <td>4.500%</td>
                                 <td>07/15/2042</td>
+                                <td>07/15/2030 @ 100</td>
+                                <td>—</td>
                                 <td><span class="tax-badge exempt">Fed Tax-Exempt</span></td>
                                 <td class="positive">101.75</td>
                                 <td>3.28%</td>
+                                <td><span class="spread-value positive">+62 bps</span></td>
                                 <td><span class="rating-badge aaa">Aaa</span></td>
+                                <td><span class="rating-badge st">MIG 1</span></td>
                             </tr>
                             <tr>
                                 <td class="mono">20772KPQ8</td>
                                 <td><a href="#">Connecticut Health & Educational Facilities</a></td>
                                 <td>Yale University</td>
                                 <td>Revenue Bonds Series 2024</td>
+                                <td>05/08/2024</td>
+                                <td>06/01/2024</td>
                                 <td>$275.0M</td>
                                 <td>$275.0M</td>
+                                <td><span class="rate-type-badge floating">Floating</span></td>
                                 <td>4.875%</td>
                                 <td>06/01/2054</td>
+                                <td>06/01/2034 @ 100</td>
+                                <td>06/01/2044</td>
                                 <td><span class="tax-badge amt">AMT</span></td>
                                 <td class="negative">99.25</td>
                                 <td>4.95%</td>
+                                <td><span class="spread-value positive">+128 bps</span></td>
                                 <td><span class="rating-badge aaa">Aaa</span></td>
+                                <td><span class="rating-badge st">VMIG 1</span></td>
                             </tr>
                             <tr>
                                 <td class="mono">574193TW2</td>
                                 <td><a href="#">Maryland Health & Higher Ed Facilities</a></td>
                                 <td>Johns Hopkins Health System</td>
                                 <td>Revenue Bonds Series 2023A</td>
+                                <td>04/26/2023</td>
+                                <td>05/15/2023</td>
                                 <td>$450.0M</td>
                                 <td>$438.6M</td>
+                                <td><span class="rate-type-badge fixed">Fixed</span></td>
                                 <td>5.125%</td>
                                 <td>05/15/2046</td>
+                                <td>05/15/2033 @ 100</td>
+                                <td>—</td>
                                 <td><span class="tax-badge exempt">Fed Tax-Exempt</span></td>
                                 <td class="positive">103.50</td>
                                 <td>3.68%</td>
+                                <td><span class="spread-value positive">+95 bps</span></td>
                                 <td><span class="rating-badge aa">Aa3</span></td>
+                                <td>—</td>
                             </tr>
                         </tbody>
                     </table>
@@ -7744,6 +8018,48 @@
                             </div>
                         </div>
 
+                        <!-- Tax Status Filter -->
+                        <div class="filter-group" id="taxStatusFilter">
+                            <div class="filter-group-header">
+                                <span><i class="fas fa-receipt"></i> Tax Status</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                            <div class="filter-group-body">
+                                <div class="checkbox-list">
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" checked>
+                                        <span class="checkmark"></span>
+                                        <span class="label">Federal Tax-Exempt</span>
+                                        <span class="count">892,456</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" checked>
+                                        <span class="checkmark"></span>
+                                        <span class="label">Taxable</span>
+                                        <span class="count">234,567</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox" checked>
+                                        <span class="checkmark"></span>
+                                        <span class="label">AMT (Alternative Minimum Tax)</span>
+                                        <span class="count">78,234</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox">
+                                        <span class="checkmark"></span>
+                                        <span class="label">State Tax-Exempt</span>
+                                        <span class="count">456,789</span>
+                                    </label>
+                                    <label class="checkbox-item">
+                                        <input type="checkbox">
+                                        <span class="checkmark"></span>
+                                        <span class="label">Bank Qualified</span>
+                                        <span class="count">123,456</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- ESG Filter -->
                         <div class="filter-group">
                             <div class="filter-group-header">
@@ -7789,8 +8105,8 @@
 
                 <!-- Right Panel - Results -->
                 <div class="screener-results-panel">
-                    <!-- Results Header -->
-                    <div class="results-header">
+                    <!-- Results Header - Issuers View -->
+                    <div class="results-header" id="issuersResultsHeader">
                         <div class="results-info">
                             <span class="results-count"><strong>3,847</strong> issuers match your criteria</span>
                             <span class="results-hint">of 52,847 total issuers</span>
@@ -7810,12 +8126,33 @@
                         </div>
                     </div>
 
-                    <!-- Column Customization Bar -->
-                    <div class="column-bar">
+                    <!-- Results Header - Securities View (Hidden by default) -->
+                    <div class="results-header" id="securitiesResultsHeader" style="display: none;">
+                        <div class="results-info">
+                            <span class="results-count"><strong>127,456</strong> securities match your criteria</span>
+                            <span class="results-hint">of 1.2M total securities</span>
+                        </div>
+                        <div class="results-actions">
+                            <div class="view-toggle">
+                                <button class="view-btn active" title="Table View"><i class="fas fa-table"></i></button>
+                                <button class="view-btn" title="Card View"><i class="fas fa-th-large"></i></button>
+                            </div>
+                            <div class="export-dropdown">
+                                <button class="btn btn-secondary btn-sm dropdown-toggle">
+                                    <i class="fas fa-download"></i> Export
+                                </button>
+                            </div>
+                            <button class="btn btn-secondary btn-sm"><i class="fas fa-columns"></i> Columns</button>
+                        </div>
+                    </div>
+
+                    <!-- Column Customization Bar - Issuers -->
+                    <div class="column-bar" id="issuersColumnBar">
                         <span class="column-bar-label">Columns:</span>
                         <div class="column-tags">
                             <span class="column-tag">Issuer Name</span>
-                            <span class="column-tag">Rating</span>
+                            <span class="column-tag">LT Rating</span>
+                            <span class="column-tag">ST Rating</span>
                             <span class="column-tag">Outlook</span>
                             <span class="column-tag">Sector</span>
                             <span class="column-tag">State</span>
@@ -7825,14 +8162,32 @@
                         </div>
                     </div>
 
-                    <!-- Results Table -->
-                    <div class="results-table-container">
+                    <!-- Column Customization Bar - Securities (Hidden by default) -->
+                    <div class="column-bar" id="securitiesColumnBar" style="display: none;">
+                        <span class="column-bar-label">Columns:</span>
+                        <div class="column-tags">
+                            <span class="column-tag">CUSIP</span>
+                            <span class="column-tag">Description</span>
+                            <span class="column-tag">Issuer</span>
+                            <span class="column-tag">LT Rating</span>
+                            <span class="column-tag">ST Rating</span>
+                            <span class="column-tag">Coupon</span>
+                            <span class="column-tag">Maturity</span>
+                            <span class="column-tag">Tax Status</span>
+                            <span class="column-tag removable">Amount <i class="fas fa-times"></i></span>
+                            <button class="add-column-btn"><i class="fas fa-plus"></i> Add</button>
+                        </div>
+                    </div>
+
+                    <!-- Results Table - Issuers View -->
+                    <div class="results-table-container" id="issuersTableContainer">
                         <table class="screener-table">
                             <thead>
                                 <tr>
                                     <th class="checkbox-col"><input type="checkbox"></th>
                                     <th class="sortable sorted-asc">Issuer Name <i class="fas fa-sort-up"></i></th>
-                                    <th class="sortable">Rating <i class="fas fa-sort"></i></th>
+                                    <th class="sortable">LT Rating <i class="fas fa-sort"></i></th>
+                                    <th class="sortable">ST Rating <i class="fas fa-sort"></i></th>
                                     <th class="sortable">Outlook <i class="fas fa-sort"></i></th>
                                     <th class="sortable">Sector <i class="fas fa-sort"></i></th>
                                     <th class="sortable">State <i class="fas fa-sort"></i></th>
@@ -7846,6 +8201,7 @@
                                     <td><input type="checkbox"></td>
                                     <td><a href="#" class="issuer-link">State of California</a></td>
                                     <td><span class="rating-badge aa">Aa2</span></td>
+                                    <td><span class="rating-badge st">P-1</span></td>
                                     <td><span class="outlook-badge stable">Stable</span></td>
                                     <td>General Obligation</td>
                                     <td>CA</td>
@@ -7857,6 +8213,7 @@
                                     <td><input type="checkbox"></td>
                                     <td><a href="#" class="issuer-link">New York City</a></td>
                                     <td><span class="rating-badge aa">Aa2</span></td>
+                                    <td><span class="rating-badge st">P-1</span></td>
                                     <td><span class="outlook-badge stable">Stable</span></td>
                                     <td>General Obligation</td>
                                     <td>NY</td>
@@ -7868,6 +8225,7 @@
                                     <td><input type="checkbox"></td>
                                     <td><a href="#" class="issuer-link">Los Angeles County MTA</a></td>
                                     <td><span class="rating-badge aa">Aa3</span></td>
+                                    <td><span class="rating-badge st">P-1</span></td>
                                     <td><span class="outlook-badge negative">Negative</span></td>
                                     <td>Transportation</td>
                                     <td>CA</td>
@@ -7879,6 +8237,7 @@
                                     <td><input type="checkbox"></td>
                                     <td><a href="#" class="issuer-link">Texas State GO</a></td>
                                     <td><span class="rating-badge aaa">Aaa</span></td>
+                                    <td><span class="rating-badge st">P-1</span></td>
                                     <td><span class="outlook-badge stable">Stable</span></td>
                                     <td>General Obligation</td>
                                     <td>TX</td>
@@ -7890,6 +8249,7 @@
                                     <td><input type="checkbox"></td>
                                     <td><a href="#" class="issuer-link">Los Angeles DWP</a></td>
                                     <td><span class="rating-badge aa">Aa2</span></td>
+                                    <td><span class="rating-badge st">P-1</span></td>
                                     <td><span class="outlook-badge stable">Stable</span></td>
                                     <td>Water & Sewer</td>
                                     <td>CA</td>
@@ -7901,6 +8261,7 @@
                                     <td><input type="checkbox"></td>
                                     <td><a href="#" class="issuer-link">Chicago Public Schools</a></td>
                                     <td><span class="rating-badge baa">Baa1</span></td>
+                                    <td><span class="rating-badge st">P-2</span></td>
                                     <td><span class="outlook-badge negative">Negative</span></td>
                                     <td>Education - K-12</td>
                                     <td>IL</td>
@@ -7912,6 +8273,7 @@
                                     <td><input type="checkbox"></td>
                                     <td><a href="#" class="issuer-link">Massachusetts Bay TA</a></td>
                                     <td><span class="rating-badge a">A2</span></td>
+                                    <td><span class="rating-badge st">P-1</span></td>
                                     <td><span class="outlook-badge stable">Stable</span></td>
                                     <td>Transportation</td>
                                     <td>MA</td>
@@ -7923,6 +8285,7 @@
                                     <td><input type="checkbox"></td>
                                     <td><a href="#" class="issuer-link">Phoenix, AZ</a></td>
                                     <td><span class="rating-badge aa">Aa2</span></td>
+                                    <td><span class="rating-badge st">P-1</span></td>
                                     <td><span class="outlook-badge positive">Positive</span></td>
                                     <td>General Obligation</td>
                                     <td>AZ</td>
@@ -7934,6 +8297,7 @@
                                     <td><input type="checkbox"></td>
                                     <td><a href="#" class="issuer-link">Miami-Dade County</a></td>
                                     <td><span class="rating-badge a">A1</span></td>
+                                    <td><span class="rating-badge st">P-1</span></td>
                                     <td><span class="outlook-badge positive">Positive</span></td>
                                     <td>General Obligation</td>
                                     <td>FL</td>
@@ -7945,11 +8309,344 @@
                                     <td><input type="checkbox"></td>
                                     <td><a href="#" class="issuer-link">San Francisco BART</a></td>
                                     <td><span class="rating-badge aa">Aa3</span></td>
+                                    <td><span class="rating-badge st">P-1</span></td>
                                     <td><span class="outlook-badge stable">Stable</span></td>
                                     <td>Transportation</td>
                                     <td>CA</td>
                                     <td class="numeric">$2.9B</td>
                                     <td><span class="action-tag affirmed">Affirmed Nov 5</span></td>
+                                    <td><button class="btn-icon"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Results Table - Securities View (Hidden by default) -->
+                    <div class="results-table-container" id="securitiesTableContainer" style="display: none;">
+                        <table class="screener-table">
+                            <thead>
+                                <tr>
+                                    <th class="checkbox-col"><input type="checkbox"></th>
+                                    <th class="sortable">CUSIP <i class="fas fa-sort"></i></th>
+                                    <th class="sortable sorted-asc">Description <i class="fas fa-sort-up"></i></th>
+                                    <th class="sortable">Issuer <i class="fas fa-sort"></i></th>
+                                    <th class="sortable">LT Rating <i class="fas fa-sort"></i></th>
+                                    <th class="sortable">ST Rating <i class="fas fa-sort"></i></th>
+                                    <th class="sortable">Coupon <i class="fas fa-sort"></i></th>
+                                    <th class="sortable">Maturity <i class="fas fa-sort"></i></th>
+                                    <th class="sortable">Tax Status <i class="fas fa-sort"></i></th>
+                                    <th class="sortable numeric">Amount <i class="fas fa-sort"></i></th>
+                                    <th class="actions-col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td class="mono">13063DAA5</td>
+                                    <td><a href="#" class="security-link">GO Bonds Series 2024A</a></td>
+                                    <td>State of California</td>
+                                    <td><span class="rating-badge aa">Aa2</span></td>
+                                    <td><span class="rating-badge st">P-1</span></td>
+                                    <td>5.000%</td>
+                                    <td>08/01/2044</td>
+                                    <td><span class="tax-badge exempt">Tax-Exempt</span></td>
+                                    <td class="numeric">$850.0M</td>
+                                    <td><button class="btn-icon"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td class="mono">64966QAB3</td>
+                                    <td><a href="#" class="security-link">GO Bonds Fiscal 2025</a></td>
+                                    <td>New York City</td>
+                                    <td><span class="rating-badge aa">Aa2</span></td>
+                                    <td><span class="rating-badge st">P-1</span></td>
+                                    <td>4.750%</td>
+                                    <td>03/01/2039</td>
+                                    <td><span class="tax-badge exempt">Tax-Exempt</span></td>
+                                    <td class="numeric">$1.2B</td>
+                                    <td><button class="btn-icon"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td class="mono">59259YBK7</td>
+                                    <td><a href="#" class="security-link">Revenue Bonds Series 2023B</a></td>
+                                    <td>Metropolitan Transportation Authority</td>
+                                    <td><span class="rating-badge a">A1</span></td>
+                                    <td><span class="rating-badge st">P-1</span></td>
+                                    <td>5.250%</td>
+                                    <td>11/15/2048</td>
+                                    <td><span class="tax-badge taxable">Taxable</span></td>
+                                    <td class="numeric">$500.0M</td>
+                                    <td><button class="btn-icon"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td class="mono">882724ZD4</td>
+                                    <td><a href="#" class="security-link">State Revolving Fund Bonds</a></td>
+                                    <td>Texas Water Development Board</td>
+                                    <td><span class="rating-badge aaa">Aaa</span></td>
+                                    <td><span class="rating-badge st">P-1</span></td>
+                                    <td>4.500%</td>
+                                    <td>07/15/2042</td>
+                                    <td><span class="tax-badge exempt">Tax-Exempt</span></td>
+                                    <td class="numeric">$325.0M</td>
+                                    <td><button class="btn-icon"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td class="mono">20772KPQ8</td>
+                                    <td><a href="#" class="security-link">Revenue Bonds Series 2024</a></td>
+                                    <td>CT Health & Educational Facilities</td>
+                                    <td><span class="rating-badge aaa">Aaa</span></td>
+                                    <td><span class="rating-badge st">P-1</span></td>
+                                    <td>4.875%</td>
+                                    <td>06/01/2054</td>
+                                    <td><span class="tax-badge amt">AMT</span></td>
+                                    <td class="numeric">$275.0M</td>
+                                    <td><button class="btn-icon"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td class="mono">574193TW2</td>
+                                    <td><a href="#" class="security-link">Revenue Bonds Series 2023A</a></td>
+                                    <td>MD Health & Higher Ed Facilities</td>
+                                    <td><span class="rating-badge aa">Aa3</span></td>
+                                    <td><span class="rating-badge st">P-1</span></td>
+                                    <td>5.125%</td>
+                                    <td>05/15/2046</td>
+                                    <td><span class="tax-badge exempt">Tax-Exempt</span></td>
+                                    <td class="numeric">$450.0M</td>
+                                    <td><button class="btn-icon"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td class="mono">34153QEG9</td>
+                                    <td><a href="#" class="security-link">Airport Revenue Bonds 2024</a></td>
+                                    <td>Florida Airports Finance Corp</td>
+                                    <td><span class="rating-badge a">A2</span></td>
+                                    <td><span class="rating-badge st">P-1</span></td>
+                                    <td>5.000%</td>
+                                    <td>10/01/2049</td>
+                                    <td><span class="tax-badge amt">AMT</span></td>
+                                    <td class="numeric">$380.0M</td>
+                                    <td><button class="btn-icon"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td class="mono">452151AB8</td>
+                                    <td><a href="#" class="security-link">GO Bonds Series 2023</a></td>
+                                    <td>State of Illinois</td>
+                                    <td><span class="rating-badge baa">Baa1</span></td>
+                                    <td><span class="rating-badge st">P-2</span></td>
+                                    <td>5.500%</td>
+                                    <td>12/01/2038</td>
+                                    <td><span class="tax-badge exempt">Tax-Exempt</span></td>
+                                    <td class="numeric">$600.0M</td>
+                                    <td><button class="btn-icon"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td class="mono">91412GHK5</td>
+                                    <td><a href="#" class="security-link">Taxable Build America Bonds</a></td>
+                                    <td>University of California</td>
+                                    <td><span class="rating-badge aa">Aa1</span></td>
+                                    <td><span class="rating-badge st">P-1</span></td>
+                                    <td>6.250%</td>
+                                    <td>05/15/2040</td>
+                                    <td><span class="tax-badge taxable">Taxable</span></td>
+                                    <td class="numeric">$750.0M</td>
+                                    <td><button class="btn-icon"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td class="mono">780153WC4</td>
+                                    <td><a href="#" class="security-link">Water Revenue Bonds 2024A</a></td>
+                                    <td>San Francisco PUC</td>
+                                    <td><span class="rating-badge aa">Aa2</span></td>
+                                    <td><span class="rating-badge st">P-1</span></td>
+                                    <td>4.625%</td>
+                                    <td>11/01/2052</td>
+                                    <td><span class="tax-badge exempt">Tax-Exempt</span></td>
+                                    <td class="numeric">$420.0M</td>
+                                    <td><button class="btn-icon"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Results Header - Deals View (Hidden by default) -->
+                    <div class="results-header" id="dealsResultsHeader" style="display: none;">
+                        <div class="results-info">
+                            <span class="results-count"><strong>4,823</strong> deals match your criteria</span>
+                            <span class="results-hint">of 89,234 total deals</span>
+                        </div>
+                        <div class="results-actions">
+                            <div class="view-toggle">
+                                <button class="view-btn active" title="Table View"><i class="fas fa-table"></i></button>
+                                <button class="view-btn" title="Card View"><i class="fas fa-th-large"></i></button>
+                                <button class="view-btn" title="Timeline View"><i class="fas fa-stream"></i></button>
+                            </div>
+                            <div class="export-dropdown">
+                                <button class="btn btn-secondary btn-sm dropdown-toggle">
+                                    <i class="fas fa-download"></i> Export
+                                </button>
+                            </div>
+                            <button class="btn btn-secondary btn-sm"><i class="fas fa-columns"></i> Columns</button>
+                        </div>
+                    </div>
+
+                    <!-- Column Customization Bar - Deals (Hidden by default) -->
+                    <div class="column-bar" id="dealsColumnBar" style="display: none;">
+                        <span class="column-bar-label">Columns:</span>
+                        <div class="column-tags">
+                            <span class="column-tag">Series Name</span>
+                            <span class="column-tag">Issuer Name</span>
+                            <span class="column-tag">Obligor Name</span>
+                            <span class="column-tag">Sale Date</span>
+                            <span class="column-tag">Par Amount</span>
+                            <span class="column-tag">LT Rating</span>
+                            <span class="column-tag">Deal Type</span>
+                            <span class="column-tag removable">Underwriter <i class="fas fa-times"></i></span>
+                            <button class="add-column-btn"><i class="fas fa-plus"></i> Add</button>
+                        </div>
+                    </div>
+
+                    <!-- Results Table - Deals View (Hidden by default) -->
+                    <div class="results-table-container" id="dealsTableContainer" style="display: none;">
+                        <table class="screener-table">
+                            <thead>
+                                <tr>
+                                    <th class="checkbox-col"><input type="checkbox"></th>
+                                    <th class="sortable sorted-desc">Series Name <i class="fas fa-sort-down"></i></th>
+                                    <th class="sortable">Issuer Name <i class="fas fa-sort"></i></th>
+                                    <th class="sortable">Obligor Name <i class="fas fa-sort"></i></th>
+                                    <th class="sortable">Sale Date <i class="fas fa-sort"></i></th>
+                                    <th class="sortable numeric">Par Amount <i class="fas fa-sort"></i></th>
+                                    <th class="sortable">LT Rating <i class="fas fa-sort"></i></th>
+                                    <th class="sortable">Deal Type <i class="fas fa-sort"></i></th>
+                                    <th class="sortable">Underwriter <i class="fas fa-sort"></i></th>
+                                    <th class="actions-col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td><a href="#" class="deal-link">GO Green Bonds Series 2024A</a></td>
+                                    <td>State of California</td>
+                                    <td>California State Treasurer</td>
+                                    <td>01/15/2024</td>
+                                    <td class="numeric">$850.0M</td>
+                                    <td><span class="rating-badge aa">Aa2</span></td>
+                                    <td><span class="deal-type-badge competitive">Competitive</span></td>
+                                    <td>BofA Securities</td>
+                                    <td><button class="btn-icon"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td><a href="#" class="deal-link">GO Bonds Fiscal 2025 Series A</a></td>
+                                    <td>New York City</td>
+                                    <td>NYC Office of Management & Budget</td>
+                                    <td>09/18/2024</td>
+                                    <td class="numeric">$1.2B</td>
+                                    <td><span class="rating-badge aa">Aa2</span></td>
+                                    <td><span class="deal-type-badge negotiated">Negotiated</span></td>
+                                    <td>J.P. Morgan</td>
+                                    <td><button class="btn-icon"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td><a href="#" class="deal-link">Transportation Revenue Bonds Series 2023B</a></td>
+                                    <td>Metropolitan Transportation Authority</td>
+                                    <td>MTA Bridges & Tunnels</td>
+                                    <td>10/25/2023</td>
+                                    <td class="numeric">$500.0M</td>
+                                    <td><span class="rating-badge a">A1</span></td>
+                                    <td><span class="deal-type-badge negotiated">Negotiated</span></td>
+                                    <td>Goldman Sachs</td>
+                                    <td><button class="btn-icon"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td><a href="#" class="deal-link">Clean Water State Revolving Fund Bonds Series 2024</a></td>
+                                    <td>Texas Water Development Board</td>
+                                    <td>TX Water Development Board</td>
+                                    <td>06/20/2024</td>
+                                    <td class="numeric">$325.0M</td>
+                                    <td><span class="rating-badge aaa">Aaa</span></td>
+                                    <td><span class="deal-type-badge competitive">Competitive</span></td>
+                                    <td>Morgan Stanley</td>
+                                    <td><button class="btn-icon"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td><a href="#" class="deal-link">Revenue Bonds (Yale University) Series 2024</a></td>
+                                    <td>CT Health & Educational Facilities Authority</td>
+                                    <td>Yale University</td>
+                                    <td>05/08/2024</td>
+                                    <td class="numeric">$275.0M</td>
+                                    <td><span class="rating-badge aaa">Aaa</span></td>
+                                    <td><span class="deal-type-badge negotiated">Negotiated</span></td>
+                                    <td>Barclays</td>
+                                    <td><button class="btn-icon"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td><a href="#" class="deal-link">Revenue Bonds (Johns Hopkins) Series 2023A</a></td>
+                                    <td>MD Health & Higher Educational Facilities</td>
+                                    <td>Johns Hopkins Health System</td>
+                                    <td>04/26/2023</td>
+                                    <td class="numeric">$450.0M</td>
+                                    <td><span class="rating-badge aa">Aa3</span></td>
+                                    <td><span class="deal-type-badge negotiated">Negotiated</span></td>
+                                    <td>Citi</td>
+                                    <td><button class="btn-icon"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                                <tr class="highlight-row positive">
+                                    <td><input type="checkbox"></td>
+                                    <td><a href="#" class="deal-link">GO Refunding Bonds Series 2024B</a></td>
+                                    <td>State of Texas</td>
+                                    <td>Texas Comptroller of Public Accounts</td>
+                                    <td>02/12/2024</td>
+                                    <td class="numeric">$425.0M</td>
+                                    <td><span class="rating-badge aaa">Aaa</span></td>
+                                    <td><span class="deal-type-badge competitive">Competitive</span></td>
+                                    <td>Wells Fargo</td>
+                                    <td><button class="btn-icon"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td><a href="#" class="deal-link">Airport Revenue Bonds Series 2024A-1</a></td>
+                                    <td>Los Angeles World Airports</td>
+                                    <td>Los Angeles International Airport</td>
+                                    <td>03/05/2024</td>
+                                    <td class="numeric">$680.0M</td>
+                                    <td><span class="rating-badge aa">Aa3</span></td>
+                                    <td><span class="deal-type-badge negotiated">Negotiated</span></td>
+                                    <td>J.P. Morgan</td>
+                                    <td><button class="btn-icon"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td><a href="#" class="deal-link">Water System Revenue Green Bonds Series 2024</a></td>
+                                    <td>San Francisco Public Utilities Commission</td>
+                                    <td>San Francisco Water Enterprise</td>
+                                    <td>04/15/2024</td>
+                                    <td class="numeric">$420.0M</td>
+                                    <td><span class="rating-badge aa">Aa2</span></td>
+                                    <td><span class="deal-type-badge negotiated">Negotiated</span></td>
+                                    <td>BofA Securities</td>
+                                    <td><button class="btn-icon"><i class="fas fa-ellipsis-v"></i></button></td>
+                                </tr>
+                                <tr class="highlight-row">
+                                    <td><input type="checkbox"></td>
+                                    <td><a href="#" class="deal-link">Sales Tax Revenue Bonds Series 2024C</a></td>
+                                    <td>Metropolitan Transit Authority of Harris County</td>
+                                    <td>Houston METRO</td>
+                                    <td>05/22/2024</td>
+                                    <td class="numeric">$350.0M</td>
+                                    <td><span class="rating-badge aa">Aa2</span></td>
+                                    <td><span class="deal-type-badge competitive">Competitive</span></td>
+                                    <td>Siebert Williams</td>
                                     <td><button class="btn-icon"><i class="fas fa-ellipsis-v"></i></button></td>
                                 </tr>
                             </tbody>
