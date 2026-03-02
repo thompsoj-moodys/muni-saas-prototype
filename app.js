@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initResearchTabs();
     initScreenerTabs();
     initPageAIAssistant();
+    initEntityDetailPage();
 });
 
 // =====================================================
@@ -2089,6 +2090,124 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // =====================================================
+// ENTITY DETAIL PAGE
+// =====================================================
+
+function initEntityDetailPage() {
+    // Handle clicks on California entity links throughout the app
+    const californiaLinks = document.querySelectorAll('a.entity-link, a.issuer-link');
+    
+    californiaLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            const linkText = link.textContent.trim().toLowerCase();
+            
+            // Check if it's a California entity link
+            if (linkText.includes('california') || linkText.includes('state of california')) {
+                e.preventDefault();
+                navigateToPage('entity-california');
+            }
+        });
+    });
+    
+    // Handle entity detail page tabs
+    const entityTabs = document.querySelectorAll('.entity-tab');
+    const entityTabContents = document.querySelectorAll('.entity-tab-content');
+    
+    entityTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const targetTab = tab.dataset.tab;
+            
+            // Update active tab
+            entityTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            // Show corresponding content
+            entityTabContents.forEach(content => {
+                content.classList.remove('active');
+                if (content.id === `entity-${targetTab}`) {
+                    content.classList.add('active');
+                }
+            });
+        });
+    });
+    
+    // Handle back to entities link
+    const backToEntitiesLinks = document.querySelectorAll('.entity-breadcrumb a[data-page="entities"]');
+    backToEntitiesLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            navigateToPage('entities');
+        });
+    });
+}
+
+// Helper function to navigate to a page
+function navigateToPage(pageId) {
+    const pages = document.querySelectorAll('.page');
+    const navLinks = document.querySelectorAll('.nav-link');
+    
+    // Hide all pages and show target
+    pages.forEach(page => {
+        page.classList.remove('active');
+        page.style.display = 'none';
+    });
+    
+    const targetPage = document.getElementById(`page-${pageId}`);
+    if (targetPage) {
+        targetPage.classList.add('active');
+        targetPage.style.display = 'block';
+    }
+    
+    // Update nav active state
+    navLinks.forEach(nav => nav.classList.remove('active'));
+    const matchingNav = document.querySelector(`.nav-link[data-page="${pageId}"]`);
+    if (matchingNav) {
+        matchingNav.classList.add('active');
+    }
+    
+    // Handle Dashboard-specific elements
+    const widgetManagerPanel = document.getElementById('widgetManagerPanel');
+    const savedViewsDropdown = document.getElementById('savedViewsDropdown');
+    const dashboardToolbar = document.querySelector('.dashboard-toolbar');
+    const watchlistWidget = document.querySelector('[data-widget-id="watchlist"]');
+    const watchlistSectionHeader = document.getElementById('watchlist-section-header');
+    const marketActivityWidget = document.querySelector('[data-widget-id="market-activity"]');
+    const liquidityWidget = document.querySelector('[data-widget-id="liquidity"]');
+    const marketLiquiditySectionHeader = document.getElementById('market-liquidity-section-header');
+    
+    if (pageId !== 'dashboard') {
+        widgetManagerPanel?.classList.remove('open');
+        widgetManagerPanel?.classList.add('dashboard-hidden');
+        savedViewsDropdown?.classList.remove('open');
+        dashboardToolbar?.classList.add('dashboard-hidden');
+        if (watchlistWidget) watchlistWidget.style.display = 'none';
+        if (watchlistSectionHeader) watchlistSectionHeader.style.display = 'none';
+        if (marketActivityWidget) marketActivityWidget.style.display = 'none';
+        if (liquidityWidget) liquidityWidget.style.display = 'none';
+        if (marketLiquiditySectionHeader) marketLiquiditySectionHeader.style.display = 'none';
+    } else {
+        widgetManagerPanel?.classList.remove('dashboard-hidden');
+        dashboardToolbar?.classList.remove('dashboard-hidden');
+        if (watchlistWidget) watchlistWidget.style.display = '';
+        if (watchlistSectionHeader) watchlistSectionHeader.style.display = '';
+        if (marketActivityWidget) marketActivityWidget.style.display = '';
+        if (liquidityWidget) liquidityWidget.style.display = '';
+        if (marketLiquiditySectionHeader) marketLiquiditySectionHeader.style.display = '';
+    }
+    
+    // Update Page AI Assistant context
+    if (window.updatePageAIContext) {
+        window.updatePageAIContext(pageId);
+    }
+    
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Reinitialize animations
+    setTimeout(() => initWidgetAnimations(), 100);
+}
+
+// =====================================================
 // PAGE-CONTEXTUAL AI ASSISTANT
 // =====================================================
 
@@ -2135,7 +2254,8 @@ function initPageAIAssistant() {
         'transportation': { name: 'Transportation', context: 'transportation authorities and infrastructure' },
         'qrate': { name: 'QRATE Tool', context: 'quick rating analysis and scenarios' },
         'screener': { name: 'Screener', context: 'issuer and security screening criteria' },
-        'monitoring': { name: 'Monitoring', context: 'portfolio monitoring and alerts' }
+        'monitoring': { name: 'Monitoring', context: 'portfolio monitoring and alerts' },
+        'entity-california': { name: 'State of California', context: 'California credit profile, ratings, financials, and debt' }
     };
     
     // Update AI context based on current page
